@@ -1,3 +1,28 @@
+const http = require('http');
+const express = require('express');
+const app = express();
+app.get("/", (request, response) => {
+    console.log(Date.now() + " Ping Received");
+    response.sendStatus(200);
+});
+app.listen(process.env.PORT);
+setInterval(() => {
+    http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 280000);
+
+
+const botconfig = require("./botconfig.json");
+const randomsnail = require('random-puppy');
+const Discord = require("discord.js");
+const bot = new Discord.Client({ disableEveryone: true });
+const prefix = "&"
+
+bot.on("ready", async () => {
+    console.log(`${bot.user.username} is online!`);
+    bot.user.setActivity("&help");
+});
+
+
 setInterval(function () {
     bot.user.setActivity("TICK TOCK GOES CLOCK");
 }, 20000);
@@ -7,15 +32,22 @@ setTimeout(function () {
         bot.user.setActivity("&help");
     }, 20000);
 }, 10000);
-
 bot.on('message', message => {
+    if (message.author.id === bot.user.id) return;
+    if (message.author.bot === true) return;
+    let args = message.content.slice(prefix.length).trim().split(' ');
+    let msg = message.content.toLowerCase()
+    if (message.author.id === bot.user.id) return;
 
-    if (msg.startsWith(prefix + "say")) {
-        if (!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply("No!");
-        let botmessage = args.slice(1).join(" ");
-        message.delete().catch();
-        message.channel.send(botmessage);
-    } else
+    //if (message.content.toLowerCase().startsWith(`${prefix}ping`)) {
+    //    message.channel.send(`:ping_pong:\nMy ping is ${Date.now() - message.createdTimestamp} ms. \n The lower the ping, the better. If my ping is very high then I may be expiriencing issues for the time being.`);
+    //} else
+    //if (msg.startsWith(prefix + "say")) {
+     //   if (!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply("No!");
+     //   let botmessage = args.slice(1).join(" ");
+     //   message.delete().catch();
+    //    message.channel.send(botmessage);
+   // } else
         if (message.content.toLowerCase().startsWith(`${prefix}countdownsec`)) {
             let cdTime = args[1] //<< variable
             setInterval(function () {
