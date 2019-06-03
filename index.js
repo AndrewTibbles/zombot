@@ -2,10 +2,17 @@ const Discord = require('discord.js');
 const { prefix, token } = require('./config.json');
 const client = new Discord.Client();
 
+client.on('warn', console.warn);
+
+client.on('error', console.error);
+
 client.once('ready', () => {
   console.log(`${client.user.username} is now online!`);
 });
 
+client.on('disconnect', () => console.log('I just disconnected, making sure you know, I will reconnect now...'));
+
+client.on('reconnecting', () => console.log('I am reconnecting now!'));
 
 setInterval(function () {
   client.user.setActivity("Lending a hand");
@@ -39,6 +46,8 @@ client.on('guildMemberRemove', member => {
 
 
 client.on('message', message => {
+  if (message.channel.type == "dm") return;
+  if (message.author.bot) return;
   if (message.author.id === client.user.id) return;
   if (message.author.client === true) return;
   let args = message.content.slice(prefix.length).trim().split(' ');
@@ -50,7 +59,7 @@ client.on('message', message => {
     message.channel.send(`:ping_pong:\nMy ping is ${Date.now() - message.createdTimestamp} ms. \n The lower the ping, the better. If my ping is very high then I may be expiriencing issues for the time being.`);
   } else
     if (msg.startsWith(prefix + "say")) {
-      if (!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply("You do not have the required permissions to manage messages!");
+      if (!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply(":x: You do not have the required permissions to manage messages!");
       let botmessage = args.slice(1).join(" ");
       message.delete().catch();
       message.channel.send(botmessage);
@@ -284,12 +293,13 @@ client.on('message', message => {
                           } else
                             if (msg.startsWith(prefix + "stop")) {
                               let mID = message.author.id;
-                              if (mID != 97017547458633728) return message.channel.send("You do not have permission to execute this command!")
+                              if (mID != 97017547458633728) return message.channel.send(":x: You do not have permission to execute this command!")
 
                               message.channel.send("Stopping self...")
                               console.log(`Bot stopped in #${message.channel.name} by ${message.member.displayName}`)
                               client.destroy()
-                            } else
+                            } 
+                            else
                               if (msg.startsWith(`${prefix}`)) {
                                 if (message.author.bot) {
                                   return;
